@@ -1,0 +1,137 @@
+{
+  "scope": "loopback only, synthetic accounts, in-memory DB; implementation not modified",
+  "results": [
+    {
+      "test": "email_not_verified",
+      "status": 201,
+      "acceptedEmail": "attack-a@example.test",
+      "authenticated": 200,
+      "note": "No mailbox confirmation required. This is not ownership proof."
+    },
+    {
+      "test": "registration_enumeration",
+      "existing": 409,
+      "unused": 201
+    },
+    {
+      "test": "sql_login_bypass",
+      "status": 400
+    },
+    {
+      "test": "csrf_missing",
+      "status": 403
+    },
+    {
+      "test": "cross_origin_write",
+      "status": 403
+    },
+    {
+      "test": "mass_assignment_other_account",
+      "status": 400,
+      "otherPreferences": {
+        "theme": "light",
+        "accent": "red"
+      }
+    },
+    {
+      "test": "private_file",
+      "path": "/src/app.js",
+      "status": 404
+    },
+    {
+      "test": "private_file",
+      "path": "/.env",
+      "status": 404
+    },
+    {
+      "test": "private_file",
+      "path": "/data/horizonte-v1.db",
+      "status": 404
+    },
+    {
+      "test": "private_file",
+      "path": "/%2e%2e/src/app.js",
+      "status": 404
+    },
+    {
+      "test": "xss_storage",
+      "status": 201,
+      "note": "User-controlled class stored; frontend escape function inspected, no browser execution claimed."
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 60,
+      "rotationStatus": 200,
+      "rotationMs": 152,
+      "oldPasswordLoginStatus": 200,
+      "loginMs": 141,
+      "postRotationSessionStatus": 401
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 80,
+      "rotationStatus": 200,
+      "rotationMs": 140,
+      "oldPasswordLoginStatus": 200,
+      "loginMs": 154,
+      "postRotationSessionStatus": 200
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 100,
+      "rotationStatus": 200,
+      "rotationMs": 139,
+      "oldPasswordLoginStatus": 200,
+      "loginMs": 178,
+      "postRotationSessionStatus": 200
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 120,
+      "rotationStatus": 200,
+      "rotationMs": 142,
+      "oldPasswordLoginStatus": 200,
+      "loginMs": 194,
+      "postRotationSessionStatus": 200
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 140,
+      "rotationStatus": 200,
+      "rotationMs": 139,
+      "oldPasswordLoginStatus": 401,
+      "loginMs": 213,
+      "postRotationSessionStatus": null
+    },
+    {
+      "test": "password_rotation_race",
+      "delayMs": 160,
+      "rotationStatus": 200,
+      "rotationMs": 137,
+      "oldPasswordLoginStatus": 401,
+      "loginMs": 238,
+      "postRotationSessionStatus": null
+    },
+    {
+      "test": "auth_rate_limit",
+      "statuses": [
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        401,
+        429
+      ]
+    }
+  ]
+}

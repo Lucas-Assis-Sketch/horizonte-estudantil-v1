@@ -1,0 +1,108 @@
+{
+  "completeness": "complete",
+  "deferred": [],
+  "documentType": "codex-security.coverage",
+  "excludePaths": [],
+  "explicitExclusions": [
+    {
+      "pattern": "node_modules/**",
+      "reason": "Implementa\u00e7\u00e3o de depend\u00eancias de terceiros fora da revis\u00e3o; lockfile inspecionado offline."
+    },
+    {
+      "pattern": ".git/**",
+      "reason": "Somente fonte atual, sem hist\u00f3rico."
+    },
+    {
+      "pattern": "data/**",
+      "reason": "Dados privados reais n\u00e3o lidos nem atacados; provas em mem\u00f3ria com dados sint\u00e9ticos."
+    }
+  ],
+  "includePaths": [
+    "."
+  ],
+  "inventoryStrategy": "repository",
+  "mode": "repository",
+  "openQuestions": [
+    {
+      "question": "Configura\u00e7\u00e3o real de proxy HTTPS, reten\u00e7\u00e3o, confirma\u00e7\u00e3o/recupera\u00e7\u00e3o de e-mail e restaura\u00e7\u00e3o ainda n\u00e3o fornecidas."
+    }
+  ],
+  "scanId": "04f06568-a61d-4f33-85aa-19e9167ac82c",
+  "schemaVersion": "1.0",
+  "surfaces": [
+    {
+      "disposition": "reported",
+      "id": "auth-session-lifecycle",
+      "label": "Login concorrente \u00e0 rota\u00e7\u00e3o de senha",
+      "notes": "src/app.js:54-57,78-80; sess\u00e3o sobreviveu em tr\u00eas atrasos testados.",
+      "receiptRefs": [
+        "artifacts/active-results.json"
+      ],
+      "riskArea": "Autentica\u00e7\u00e3o e revoga\u00e7\u00e3o"
+    },
+    {
+      "disposition": "reported",
+      "id": "email-membership",
+      "label": "Privacidade da exist\u00eancia de conta",
+      "notes": "src/app.js:45,50; 409 vs 201 reproduzidos. Sem emails reais.",
+      "receiptRefs": [
+        "artifacts/active-results.json"
+      ],
+      "riskArea": "Privacidade"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "api-ownership-csrf",
+      "label": "Isolamento de conta, origem e CSRF",
+      "notes": "src/app.js:29-34,59-80. Conta derivada da sess\u00e3o e schemas strict; origem hostil e CSRF ausente 403; seletor de outra conta 400; prefer\u00eancias alheias intactas.",
+      "receiptRefs": [
+        "artifacts/active-results.json"
+      ],
+      "riskArea": "Autoriza\u00e7\u00e3o"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "render-static",
+      "label": "Inje\u00e7\u00e3o e isolamento de arquivos est\u00e1ticos",
+      "notes": "frontend/app.js:6,24-28 escapa dados; mensagens textContent; SQL parametrizado src/app.js; static somente frontend src/app.js:85. Probes src/.env/db/traversal 404; SQL inv\u00e1lido 400. Payload HTML armazenado n\u00e3o \u00e9 evid\u00eancia de XSS: sink escapa. Nenhuma execu\u00e7\u00e3o XSS browser demonstrada.",
+      "receiptRefs": [
+        "artifacts/active-results.json"
+      ],
+      "riskArea": "XSS, SQL e leitura de arquivos"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "password-storage",
+      "label": "Deriva\u00e7\u00e3o de senha e ciclo de sess\u00e3o sequencial",
+      "notes": "src/password.js completo; src/db.js completo; scrypt salt aleat\u00f3rio, timingSafeEqual, hash de token, uma hora. Tests funcionais sequenciais 9/9; revis\u00e3o de todos arquivos de configura\u00e7\u00e3o/documenta\u00e7\u00e3o/testes n\u00e3o encontrou segredos reais.",
+      "receiptRefs": [],
+      "riskArea": "Criptografia e segredos"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "rate-limits-config",
+      "label": "Limites e configura\u00e7\u00e3o de implanta\u00e7\u00e3o",
+      "notes": "src/config.js/server.js completos; src/app.js:23-28 quotas habilitadas por default; 16\u00aa tentativa 429. Loopback, HTTPS origem obrigat\u00f3rio em produ\u00e7\u00e3o, trustProxy false/loopback. Sem benchmark de carga ou auditoria de proxy real.",
+      "receiptRefs": [
+        "artifacts/active-results.json"
+      ],
+      "riskArea": "Disponibilidade e configura\u00e7\u00e3o"
+    },
+    {
+      "disposition": "rejected",
+      "id": "self-reported-identity",
+      "label": "E-mail e turma autodeclarados",
+      "notes": "Cadastro sem verifica\u00e7\u00e3o reproduzido; README.md declara contas pr\u00f3prias e turma autodeclarada sem autoriza\u00e7\u00e3o escolar. N\u00e3o comprova takeover nem escalada; permanece limita\u00e7\u00e3o para publica\u00e7\u00e3o, n\u00e3o achado separado.",
+      "receiptRefs": [],
+      "riskArea": "Identidade"
+    },
+    {
+      "disposition": "no_issue_found",
+      "id": "repository-current-source",
+      "label": "Revis\u00e3o de toda fonte versionada e aus\u00eancia de credenciais",
+      "notes": "Auditor independente leu integralmente 17 arquivos: .env.example,.gitignore,package.json,package-lock.json,README.md,frontend/{app.js,favicon.svg,index.html,palette.css,styles.css},scripts/check.js,src/{app.js,config.js,db.js,password.js,server.js},test/app.test.js. Pai confirmou consumidores e fronteiras. N\u00e3o houve consulta de advisories; depend\u00eancias de terceiros exclu\u00eddas.",
+      "receiptRefs": [],
+      "riskArea": "C\u00f3digo/configura\u00e7\u00e3o e cadeia de execu\u00e7\u00e3o"
+    }
+  ]
+}

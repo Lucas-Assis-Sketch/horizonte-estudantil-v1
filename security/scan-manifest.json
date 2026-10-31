@@ -1,0 +1,109 @@
+{
+  "documentType": "codex-security.scan-manifest",
+  "scan": {
+    "artifacts": [
+      {
+        "mediaType": "application/json",
+        "path": "findings.json",
+        "sha256": "ba4ac0864a8ed45d61b476c2df3f791c6fa3d4b346b75adb27c89044fe9e3381"
+      },
+      {
+        "mediaType": "application/json",
+        "path": "coverage.json",
+        "sha256": "ade871ce2071347f5908426e932bf0b42e05711befc850bd88d2535a44adc3be"
+      },
+      {
+        "mediaType": "application/octet-stream",
+        "path": "artifacts/active-results.json",
+        "sha256": "6f0ae1680d2f7f325212301597bcdffac569982ece80a786c72a49340e50f303"
+      }
+    ],
+    "completedAt": "2026-10-31T01:06:42.003132Z",
+    "coverageRef": "coverage.json",
+    "findingsRef": "findings.json",
+    "id": "04f06568-a61d-4f33-85aa-19e9167ac82c",
+    "preservedSources": {
+      "checkpoint-heads/99f39480d9a67be6cdbc37cc7357405a6b772a7487f536cd4fc41ac5d40a5b88.json": "99f39480d9a67be6cdbc37cc7357405a6b772a7487f536cd4fc41ac5d40a5b88",
+      "checkpoints/186988aea5ace19da4cd5a6ccaa8bf12ceb3c41882de73302faf8d14324e38a3.json": "186988aea5ace19da4cd5a6ccaa8bf12ceb3c41882de73302faf8d14324e38a3",
+      "checkpoints/4b08b71c4d9110c67f7a8c6dc4748a618af6fd916a535014d3dfff766ed2126c.json": "4b08b71c4d9110c67f7a8c6dc4748a618af6fd916a535014d3dfff766ed2126c",
+      "checkpoints/86e8989d2c7634a3606b5de71090267434d3a9361d9e477155ec76d9211a8f68.json": "bdfeb07d75de73d619415245431f5fc5b3c02f192cebae462bd1a4063617c9e4",
+      "checkpoints/a112d51740cc8abfed55c25f9b61d78ee6e043becde7b646fd44dc3ad3e7b431.json": "a112d51740cc8abfed55c25f9b61d78ee6e043becde7b646fd44dc3ad3e7b431",
+      "checkpoints/a2796bd3a0631dadd039e535cb654198818c21d3a6a4eba1b61ab0a6dae3b0ef.json": "d7b6f46535ab13a1c8e2d49e1d62af82387c111251d55bd59e289c681dc3f94b",
+      "checkpoints/f7d75a61f2e2568003294549aada1da01d7daed6513a442624db56794d5f5670.json": "373e6b328609dc629e43dc90c830e840e1b77635a21ef664ae85cc4da7d72f8d",
+      "source-order/a7f5a8b9e95234b7021da0cf61b26c19f1f650dbf911aa13bfcbfd7c8ffc4c00.json": "a7f5a8b9e95234b7021da0cf61b26c19f1f650dbf911aa13bfcbfd7c8ffc4c00"
+    },
+    "producer": {
+      "name": "codex-security-plugin",
+      "version": "0.1.32"
+    },
+    "scope": {
+      "artifactsReviewed": [
+        "artifacts/active-results.json",
+        "artifacts/active-probes.mjs"
+      ],
+      "context": "Modelo gerado por revis\u00e3o de arquitetura independente; auditoria independente, investiga\u00e7\u00e3o focada e valida\u00e7\u00e3o pelo pai. Testes ativos solicitados pelo usu\u00e1rio; nenhuma corre\u00e7\u00e3o aplicada.",
+      "excludePaths": [],
+      "includePaths": [
+        "."
+      ],
+      "limitations": [
+        "Sem exposi\u00e7\u00e3o p\u00fablica, testes com dados reais, engenharia social ou terceiros.",
+        "Sem pentest de infraestrutura, busca de CVEs ou benchmark de exaust\u00e3o.",
+        "Controle de acesso ao filesystem, backup, reten\u00e7\u00e3o e recupera\u00e7\u00e3o de e-mail dependem de implanta\u00e7\u00e3o futura."
+      ],
+      "runtimeStatus": "9 testes funcionais aprovados e probes locais conclu\u00eddos; implementa\u00e7\u00e3o congelada.",
+      "summary": "Revis\u00e3o da fonte versionada da vers\u00e3o 1.0, commit 2605507a9f41e096d37a459f889637127b052c7e.",
+      "validationMode": "static review and authorized loopback HTTP probes"
+    },
+    "sealedAt": "2026-10-31T01:06:42.003132Z",
+    "startedAt": "2026-10-31T01:00:09.822221Z",
+    "status": "completed",
+    "target": {
+      "displayName": "horizonte-v1",
+      "kind": "git_revision",
+      "revision": "2605507a9f41e096d37a459f889637127b052c7e",
+      "targetId": "target_sha256_c74dfbf1890b5d641f24ea3fae8ee3ee89248c727a8c0b4e29a65651b7c62a32"
+    },
+    "threatModel": {
+      "assets": [
+        "E-mail normalizado, turma autodeclarada, prefer\u00eancias e password_hash em SQLite (src/db.js:10-14). DB_PATH \u00e9 resolvido contra cwd: padr\u00e3o <repo>/data/horizonte-v1.db quando iniciado da raiz; WAL, permiss\u00f5es/criptografia/backup externos (src/config.js:12; src/db.js:7-19).",
+        "Senhas: scrypt-v1, salt aleat\u00f3rio 16 bytes, chave 64 bytes, N=32768 r=8 p=1; compara\u00e7\u00e3o timingSafeEqual; nunca retornadas em publicAccount (src/password.js:4-14; src/app.js:15).",
+        "Tokens aleat\u00f3rios 32 bytes, SHA-256 no banco; CSRF separado, em banco e JSON autenticado; validade absoluta de uma hora; segredo do cookie no navegador (src/db.js:5-6,27-30; src/app.js:35-38,59-65).",
+        "Integridade da interface e dos arquivos frontend; raiz est\u00e1tica module-relative separada de src e data (src/app.js:85). N\u00e3o h\u00e1 notas, pagamentos, inscri\u00e7\u00f5es ou dados institucionais nesta vers\u00e3o (README.md:25)."
+      ],
+      "assumptions": [
+        "Entrega local, sem proxy p\u00fablico estabelecido. Exposi\u00e7\u00e3o p\u00fablica/TLS dependem do operador (README.md:50; src/server.js:7).",
+        "Revis\u00e3o independente mapeou recursos; pai verificou consumidores src/config.js,server.js,db.js,app.js. N\u00e3o h\u00e1 modelo fornecido, knowledge base ou SECURITY.md aplic\u00e1vel encontrado.",
+        ".env privado, dados reais, depend\u00eancias instaladas e infraestrutura n\u00e3o auditados. Metadados/lockfile inspecionados offline; nenhuma consulta de CVEs foi feita.",
+        "README data/horizonte-v1.db corresponde ao startup normal na raiz; DB_PATH/cwd podem escolher outro local (README.md:14; src/config.js:12).",
+        "Desenvolvimento usa cookie n\u00e3o Secure em HTTP loopback; produ\u00e7\u00e3o exige HTTPS origem e prefixo __Host/Secure, mas n\u00e3o prov\u00ea servidor TLS (src/app.js:18-21).",
+        "Testes diretos app(...,{limits:false}) n\u00e3o alteram defaults de produ\u00e7\u00e3o; testes ativos de quota usam limits padr\u00e3o (test/app.test.js:10-12; src/server.js:7)."
+      ],
+      "attackerCapabilities": [
+        "Cliente com acesso ao listener pode cadastrar contas sint\u00e9ticas, escolher e-mail/turma/senha, enviar headers/cookies e concorrer requisi\u00e7\u00f5es. N\u00e3o se presume exposi\u00e7\u00e3o remota nem acesso ao sistema operacional (src/server.js:7; src/app.js:42-58).",
+        "Conta comum pode ler pr\u00f3prios metadados, alterar prefer\u00eancias, sair, trocar senha com senha atual. Sem listar contas, atribuir pap\u00e9is, upload, envio de e-mails ou pagamento (src/app.js:59-85).",
+        "Site hostil n\u00e3o recebe autoridade same-origin/cookies/CSRF; controles Origin, JSON, SameSite e CSRF s\u00e3o independentes (src/app.js:18-19,29-34,59-64).",
+        "Atacante com senha antiga comprometida pode tentar sobrepor login e troca de senha; n\u00e3o se presume conhecimento da nova senha ou controle de configura\u00e7\u00e3o."
+      ],
+      "securityObjectives": [
+        "N\u00e3o persistir nem retornar senhas em texto puro (src/password.js:4-14; src/app.js:15).",
+        "Isolar leituras/escritas por sess\u00e3o n\u00e3o expirada e evitar seletores de outras contas (src/app.js:59-80).",
+        "Ap\u00f3s troca de senha, senha anterior n\u00e3o deve criar sess\u00e3o sobrevivente; logout revoga sess\u00e3o atual (src/app.js:66,71-81).",
+        "Proteger mudan\u00e7as contra CSRF, renderiza\u00e7\u00e3o contra inje\u00e7\u00e3o e arquivos contra escape da raiz est\u00e1tica; manter limites (src/app.js:21-34,59-69,85; frontend/app.js:6).",
+        "Turma/e-mail autodeclarados n\u00e3o s\u00e3o prova de identidade nem autoriza\u00e7\u00e3o escolar (README.md:25,50).",
+        "Conforme pedido, ap\u00f3s iniciar an\u00e1lise de seguran\u00e7a n\u00e3o modificar implementa\u00e7\u00e3o; testes ativos somente loopback e dados sint\u00e9ticos."
+      ],
+      "summary": "Horizonte 1.0: contas locais de estudantes, home, sete olimp\u00edadas vazias e prefer\u00eancias. start/dev executam src/server.js (package.json:4). Express/API e frontend mesma origem (src/app.js:41-85). Listener sempre HTTP em 127.0.0.1:4173 por padr\u00e3o; produ\u00e7\u00e3o exige proxy HTTPS externo, n\u00e3o fornecido (src/server.js:7; src/config.js:3-12). Modelo gerado com revis\u00e3o independente de arquitetura.",
+      "trustBoundaries": [
+        "Cliente -> API: JSON 8kb, quotas 150/min e 15 autentica\u00e7\u00f5es/15min por IP, Origin exato para escritas; timeouts 15s/10s (src/app.js:23-34; src/server.js:8). Origin n\u00e3o autentica clientes n\u00e3o navegador.",
+        "Cadastro/login -> autoridade da conta: schemas estritos, scrypt, sess\u00e3o; e-mail/turma s\u00e3o entradas autodeclaradas sem atestado (src/app.js:9-13,42-57).",
+        "Cookie -> conta: hash de token n\u00e3o expirado; altera\u00e7\u00f5es autenticadas tamb\u00e9m exigem CSRF; account_id exclusivamente da sess\u00e3o (src/app.js:59-80).",
+        "Troca de senha exige senha atual, deriva\u00e7\u00e3o ass\u00edncrona, atualiza\u00e7\u00e3o condicional hash antigo e revoga\u00e7\u00e3o em transa\u00e7\u00e3o; logout remove sess\u00e3o atual (src/app.js:66,71-81).",
+        "JSON -> DOM: escapeHTML em e-mail/turma; mensagens textContent; temas/cores enums; CSP self e no-store (frontend/app.js:6-17,24-28; src/app.js:21-22,67-69).",
+        "Servidor -> SQLite: statements parametrizados, foreign keys, WAL; host filesystem trusted, sem ACL/cifra/backup implementados (src/db.js:7-19).",
+        "Proxy externo -> loopback: TRUST_PROXY falso ou loopback, configur\u00e1vel apenas nesse valor; HTTPS APP_ORIGIN obrigat\u00f3rio em produ\u00e7\u00e3o; Secure/__Host cookies em produ\u00e7\u00e3o, HttpOnly/SameSite=Strict em todos modos; proxy deve sobrescrever X-Forwarded-For (.env.example:5-6; src/config.js:9-12; src/app.js:18-21)."
+      ]
+    }
+  },
+  "schemaVersion": "1.0"
+}

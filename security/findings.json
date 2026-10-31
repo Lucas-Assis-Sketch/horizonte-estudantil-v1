@@ -1,0 +1,269 @@
+{
+  "documentType": "codex-security.findings",
+  "findings": [
+    {
+      "attackPath": {
+        "dataflow": {
+          "summary": "senha antiga -> hash capturado -> await scrypt -> troca muda hash e apaga sess\u00f5es -> issue insere sess\u00e3o nova -> /api/me aceita"
+        },
+        "reachability": {
+          "summary": "POST /api/auth/login \u00e9 p\u00fablico para clientes com acesso ao listener local. Exige senha antiga, headers v\u00e1lidos e sincroniza\u00e7\u00e3o; proxy p\u00fablico \u00e9 condicional, n\u00e3o observado."
+        },
+        "summary": "Atacante que conhece a senha antiga sobrep\u00f5e login \u00e0 troca feita pelo titular e usa o cookie emitido depois da revoga\u00e7\u00e3o."
+      },
+      "codeEvidence": [
+        {
+          "code": "const input = credentials.parse(req.body), a = db.prepare('SELECT * FROM accounts WHERE email=?').get(input.email);\n    const valid = await verifyPassword(input.password, a?.password_hash || await dummy);\n    if (!a || !valid) fail(401,'E-mail ou senha incorretos.');\n    const s = issue(req,res,a.id); res.json({user:publicAccount(a),csrfToken:s.csrf});",
+          "endLine": 57,
+          "explanation": "O atacante fornece senha antiga. A conta e o hash s\u00e3o capturados antes da deriva\u00e7\u00e3o ass\u00edncrona; ao retomar, issue cria sess\u00e3o sem verificar se o hash ainda \u00e9 atual.",
+          "id": "login-stale-hash",
+          "label": "Login mant\u00e9m hash anterior ao await",
+          "language": "javascript",
+          "path": "src/app.js",
+          "role": "root_control",
+          "startLine": 54
+        },
+        {
+          "code": "const result = db.prepare('UPDATE accounts SET password_hash=? WHERE id=? AND password_hash=?').run(encoded,a.id,a.password_hash);\n      if (!result.changes) fail(409,'A senha foi alterada em outra sess\u00e3o. Entre novamente.');\n      db.prepare('DELETE FROM sessions WHERE account_id=?').run(a.id); res.clearCookie(cookieName,cookieOptions);",
+          "endLine": 80,
+          "explanation": "A troca atualiza hash e elimina sess\u00f5es existentes; o login pendente pode inserir outra sess\u00e3o depois dessa transa\u00e7\u00e3o.",
+          "id": "rotation-revokes",
+          "label": "Troca revoga apenas sess\u00f5es j\u00e1 inseridas",
+          "language": "javascript",
+          "path": "src/app.js",
+          "role": "expected_control",
+          "startLine": 78
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "Revis\u00e3o independente e pai confirmaram fluxo; tr\u00eas tentativas locais (80/100/120ms) produziram login 200 e /api/me 200 ap\u00f3s troca 200."
+      },
+      "findingId": "csf_261efd7012ac9738f6281d5a",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:2cde552f2203e1cfc2c7a83566499e18465b1cec49a03eb1e92e2dedc32bc1c5"
+      },
+      "identity": {
+        "anchor": "login-com-senha-antiga-pode-sobreviver-a-troca-de-senha"
+      },
+      "locations": [
+        {
+          "endLine": 57,
+          "path": "src/app.js",
+          "role": "root_control",
+          "startLine": 54
+        },
+        {
+          "endLine": 80,
+          "path": "src/app.js",
+          "role": "expected_control",
+          "startLine": 78
+        }
+      ],
+      "occurrenceId": "occ_de5c0cb9552da741f28b3983",
+      "preventiveControls": [
+        "Associar sess\u00f5es a uma vers\u00e3o de credencial invalidada em cada troca."
+      ],
+      "provenance": {
+        "candidateId": "baseline-password-race",
+        "originalCandidates": [
+          {
+            "attacker": "Conhece senha antiga e sincroniza login com rota\u00e7\u00e3o.",
+            "confidence": "high",
+            "counterevidence": [
+              "Exige senha antiga/timing; listener local; limite auth 15/15min.",
+              "Sess\u00f5es preexistentes s\u00e3o revogadas; password change CAS funciona."
+            ],
+            "cwe": "CWE-367",
+            "endLine": 57,
+            "impact": "Sess\u00e3o nova pode sobreviver \u00e0 revoga\u00e7\u00e3o at\u00e9 uma hora.",
+            "path": "src/app.js",
+            "remediation": "Revalidar hash atual e inserir sess\u00e3o na mesma transa\u00e7\u00e3o sem await.",
+            "severity": "medium",
+            "sourceEvidence": "Login l\u00ea password_hash na linha 54, aguarda scrypt na 55 e emite sess\u00e3o na 57 sem revalidar; troca atualiza hash e apaga sess\u00f5es nas linhas 78-80.",
+            "startLine": 54,
+            "title": "Concurrent old-password login can create a session after password-change revocation"
+          },
+          {
+            "attacker": "Conhece senha antiga e sincroniza login com rota\u00e7\u00e3o.",
+            "confidence": "high",
+            "counterevidence": [
+              "Exige senha antiga/timing; listener local; limite auth 15/15min.",
+              "Sess\u00f5es preexistentes s\u00e3o revogadas; password change CAS funciona."
+            ],
+            "cwe": "CWE-367",
+            "endLine": 57,
+            "impact": "Sess\u00e3o nova pode sobreviver \u00e0 revoga\u00e7\u00e3o at\u00e9 uma hora.",
+            "path": "src/app.js",
+            "remediation": "Revalidar hash atual e inserir sess\u00e3o na mesma transa\u00e7\u00e3o sem await.",
+            "severity": "medium",
+            "sourceEvidence": "Login l\u00ea password_hash na linha 54, aguarda scrypt na 55 e emite sess\u00e3o na 57 sem revalidar; troca atualiza hash e apaga sess\u00f5es nas linhas 78-80.",
+            "startLine": 54,
+            "title": "Concurrent old-password login can create a session after password-change revocation"
+          }
+        ],
+        "source": "local_plugin"
+      },
+      "remediation": "Ap\u00f3s verificar a senha, revalidar o hash atual e inserir a sess\u00e3o na mesma transa\u00e7\u00e3o, sem await intermedi\u00e1rio. N\u00e3o foi aplicada corre\u00e7\u00e3o.",
+      "remediationTests": [
+        "Sobrepor login com senha antiga e troca; nenhum cookie emitido com credenciais anteriores pode autenticar ap\u00f3s a troca."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "login-stale-hash",
+          "rotation-revokes"
+        ],
+        "summary": "O await de scrypt separa a leitura do estado de credenciais da inser\u00e7\u00e3o da sess\u00e3o. A troca concorrente altera esse estado e revoga sess\u00f5es, mas o login n\u00e3o revalida o hash capturado antes de emitir autoridade."
+      },
+      "ruleId": "authentication.stale-password-session",
+      "severity": {
+        "changeConditions": "Aumenta com exposi\u00e7\u00e3o p\u00fablica e acesso a dados escolares; diminui se emiss\u00e3o de sess\u00e3o e vers\u00e3o de credencial forem verificadas atomicamente.",
+        "level": "medium",
+        "rationale": "Requer conhecimento pr\u00e9vio da senha antiga e concorr\u00eancia com a troca. A sess\u00e3o conserva leitura de e-mail/turma e escrita de prefer\u00eancias por at\u00e9 uma hora; n\u00e3o concede altera\u00e7\u00e3o da nova senha. Exposi\u00e7\u00e3o atual somente loopback e quotas reduzem alcance."
+      },
+      "summary": "Quando um login com senha antiga est\u00e1 em andamento durante a troca de senha, a verifica\u00e7\u00e3o pode terminar ap\u00f3s a revoga\u00e7\u00e3o e criar uma sess\u00e3o v\u00e1lida. Reprodu\u00e7\u00e3o HTTP local confirmou sess\u00e3o aceita por /api/me ap\u00f3s a troca.",
+      "taxonomy": {
+        "category": "Authentication race / stale credential acceptance",
+        "cwe": [
+          "CWE-367"
+        ]
+      },
+      "title": "Login com senha antiga pode sobreviver \u00e0 troca de senha",
+      "validation": {
+        "evidenceRefs": [
+          "login-stale-hash",
+          "rotation-revokes"
+        ],
+        "limitations": [
+          "Nenhuma exposi\u00e7\u00e3o p\u00fablica ou dados reais testados.",
+          "Provas de corrida usam app com quotas desabilitadas no construtor de teste; cada sequ\u00eancia isolada cabe na quota normal."
+        ],
+        "method": "Revis\u00e3o est\u00e1tica independente e reprodu\u00e7\u00e3o HTTP loopback com contas sint\u00e9ticas/SQLite em mem\u00f3ria.",
+        "summary": "Nos atrasos de 80/100/120ms, a troca concluiu antes do login com a senha antiga; o cookie retornado depois continuou aceito por /api/me. Nos casos fora da janela, a sess\u00e3o foi revogada ou o login negado."
+      }
+    },
+    {
+      "attackPath": {
+        "dataflow": {
+          "summary": "e-mail candidato -> normaliza\u00e7\u00e3o -> SELECT accounts -> exist\u00eancia -> 409 ou cria\u00e7\u00e3o 201"
+        },
+        "reachability": {
+          "summary": "POST /api/auth/register n\u00e3o exige sess\u00e3o. Atacante precisa alcan\u00e7ar loopback e respeitar quota; exposi\u00e7\u00e3o remota n\u00e3o foi demonstrada."
+        },
+        "summary": "Cliente local cadastra um endere\u00e7o candidato com campos v\u00e1lidos e distingue status 409 de 201."
+      },
+      "codeEvidence": [
+        {
+          "code": "if (db.prepare('SELECT id FROM accounts WHERE email=?').get(input.email)) fail(409,'N\u00e3o foi poss\u00edvel criar a conta com esses dados. Tente entrar ou use outro e-mail.');",
+          "explanation": "O e-mail candidato fornecido pelo atacante \u00e9 consultado no banco e a exist\u00eancia determina 409, distingu\u00edvel do cadastro bem-sucedido.",
+          "id": "duplicate-email-branch",
+          "label": "Estado da conta determina resposta observ\u00e1vel",
+          "language": "javascript",
+          "path": "src/app.js",
+          "role": "root_control",
+          "startLine": 45
+        },
+        {
+          "code": "res.status(201).json({user:publicAccount(db.prepare('SELECT * FROM accounts WHERE id=?').get(id)),csrfToken:s.csrf});",
+          "explanation": "Endere\u00e7os novos produzem 201 e sess\u00e3o, oferecendo um or\u00e1culo de exist\u00eancia apesar do texto gen\u00e9rico no erro.",
+          "id": "registration-success",
+          "label": "Novo endere\u00e7o recebe resposta diferente",
+          "language": "javascript",
+          "path": "src/app.js",
+          "role": "outcome",
+          "startLine": 50
+        }
+      ],
+      "confidence": {
+        "level": "high",
+        "rationale": "Fonte direta e teste HTTP confirmaram 409 para endere\u00e7o existente e 201 para endere\u00e7o sint\u00e9tico novo."
+      },
+      "findingId": "csf_9932a43b091bb50fc13101e8",
+      "fingerprints": {
+        "algorithm": "codex-security/v1",
+        "primary": "codex-security/v1:sha256:607ad5b6e1f613e0052dbaea69f5f2bc3b60d309089aded094e94f6a157a990c"
+      },
+      "identity": {
+        "anchor": "cadastro-permite-descobrir-se-um-e-mail-ja-possui-conta"
+      },
+      "locations": [
+        {
+          "path": "src/app.js",
+          "role": "root_control",
+          "startLine": 45
+        },
+        {
+          "path": "src/app.js",
+          "role": "outcome",
+          "startLine": 50
+        }
+      ],
+      "occurrenceId": "occ_12d7cf6f6f0488a3a016ac62",
+      "preventiveControls": [
+        "Definir pol\u00edtica de privacidade da exist\u00eancia da conta e fluxo de confirma\u00e7\u00e3o de e-mail."
+      ],
+      "provenance": {
+        "candidateId": "email-membership",
+        "originalCandidates": [
+          {
+            "confidence": "high",
+            "counterevidence": "Somente loopback, quota 15/15min, sondas de endere\u00e7os novos criam conta.",
+            "path": "src/app.js",
+            "remediation": "Resposta uniforme com confirma\u00e7\u00e3o de posse de e-mail.",
+            "severity": "low",
+            "sourceEvidence": "SELECT por e-mail produz 409; cadastro novo produz 201 nas linhas 46-50.",
+            "startLine": 45,
+            "title": "Registration discloses whether an email address has an account"
+          },
+          {
+            "confidence": "high",
+            "counterevidence": "Somente loopback, quota 15/15min, sondas de endere\u00e7os novos criam conta.",
+            "path": "src/app.js",
+            "remediation": "Resposta uniforme com confirma\u00e7\u00e3o de posse de e-mail.",
+            "severity": "low",
+            "sourceEvidence": "SELECT por e-mail produz 409; cadastro novo produz 201 nas linhas 46-50.",
+            "startLine": 45,
+            "title": "Registration discloses whether an email address has an account"
+          }
+        ],
+        "source": "local_plugin"
+      },
+      "remediation": "Se a presen\u00e7a da conta precisar ser privada, usar resposta de cadastro uniforme com confirma\u00e7\u00e3o de posse por e-mail. N\u00e3o foi aplicada corre\u00e7\u00e3o.",
+      "remediationTests": [
+        "Comparar respostas observ\u00e1veis para endere\u00e7os existentes e novos sem expor exist\u00eancia."
+      ],
+      "rootCause": {
+        "evidenceRefs": [
+          "duplicate-email-branch",
+          "registration-success"
+        ],
+        "summary": "O endpoint p\u00fablico revela o resultado da consulta de unicidade por status e corpo da resposta. Origin/JSON n\u00e3o impedem um cliente HTTP direto de enviar os cabe\u00e7alhos exigidos."
+      },
+      "ruleId": "privacy.registration-enumeration",
+      "severity": {
+        "changeConditions": "O risco aumenta com exposi\u00e7\u00e3o p\u00fablica e p\u00fablico de estudantes; pode ser reduzido com respostas uniformes e confirma\u00e7\u00e3o de posse de e-mail.",
+        "level": "low",
+        "rationale": "Exp\u00f5e somente participa\u00e7\u00e3o de um endere\u00e7o candidato, exige alcance ao servi\u00e7o local, \u00e9 limitado a 15 tentativas/15min e cria contas para endere\u00e7os novos. N\u00e3o revela senha, turma ou prefer\u00eancias de terceiros."
+      },
+      "summary": "Uma tentativa de cadastro com endere\u00e7o existente retorna 409; um endere\u00e7o novo retorna 201. Um cliente local distingue a presen\u00e7a de um e-mail no banco, mesmo com mensagem de erro gen\u00e9rica.",
+      "taxonomy": {
+        "category": "Account membership enumeration",
+        "cwe": [
+          "CWE-204"
+        ]
+      },
+      "title": "Cadastro permite descobrir se um e-mail j\u00e1 possui conta",
+      "validation": {
+        "evidenceRefs": [
+          "duplicate-email-branch",
+          "registration-success"
+        ],
+        "method": "Revis\u00e3o est\u00e1tica e teste HTTP em loopback.",
+        "summary": "Cadastro do endere\u00e7o sint\u00e9tico inicial retornou 201; repeti\u00e7\u00e3o retornou 409; outro endere\u00e7o novo retornou 201. N\u00e3o foram sondados endere\u00e7os reais."
+      }
+    }
+  ],
+  "scanId": "04f06568-a61d-4f33-85aa-19e9167ac82c",
+  "schemaVersion": "1.0"
+}
