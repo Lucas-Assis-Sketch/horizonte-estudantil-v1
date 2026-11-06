@@ -31,3 +31,7 @@ Esta alteração é local. Para publicação, validar HTTPS, domínio, hospedage
 ## Requisitos
 
 O escopo atual, os critérios de aceitação, as melhorias propostas e as instruções para testar na escola estão em [docs/requisitos/README.md](docs/requisitos/README.md).
+
+## Hospedagem na Netlify
+
+O site é publicado na Netlify como estático: o `netlify.toml` na raiz publica a pasta `frontend/` sem etapa de build e aplica cabeçalhos de segurança (CSP, `nosniff`, `Referrer-Policy`, `Permissions-Policy`). O servidor Express em `src/` continua disponível apenas para desenvolvimento local e testes; `/api/health` não existe na versão publicada.
