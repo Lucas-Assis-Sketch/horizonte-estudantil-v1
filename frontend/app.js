@@ -14,7 +14,7 @@ function apply(p){document.documentElement.dataset.theme=p.theme;document.docume
 apply(visitorPrefs);
 let toastTimer;
 function toast(text){notice.textContent=text;notice.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>notice.hidden=true,6000);}
-const brand=()=>`<span class="brand-mark" aria-hidden="true">IOS</span><span class="brand-name">IOS<small>INICIAÇÃO OLÍMPICA<br>SESI</small></span>`;
+const brand=()=>`<span class="brand-mark" aria-hidden="true"><span class="brand-symbol"></span></span><span class="brand-name">IOS<small>INICIAÇÃO OLÍMPICA<br>SESI</small></span>`;
 const subjectDesigns={
  OBMEP:{kind:'math',label:'Matemática',hint:'Números, formas e possibilidades',art:`<path d="M187 38 251 126H123Z" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="236" cy="65" r="33" fill="currentColor" opacity=".16"/><path d="M102 107h44v44h-44zM111 116h10v10" fill="none" stroke="currentColor" stroke-width="2"/><text x="34" y="67">π</text><text x="267" y="129" class="art-small">x²</text><text x="58" y="138" class="art-small">√</text><path d="M184 126v-17h17" fill="none" stroke="currentColor" stroke-width="2"/>`},
  OMU:{kind:'math-alt',label:'Matemática',hint:'Ideias que se conectam',art:`<path d="M54 132h222M109 151V39" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/><path d="M63 111c41-96 77 78 126-17s64-44 86-34" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="188" cy="96" r="7" fill="currentColor"/><text x="223" y="137">∞</text><text x="39" y="65" class="art-small">ƒ(x)</text><circle cx="252" cy="49" r="23" fill="currentColor" opacity=".12"/>`},

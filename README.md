@@ -27,3 +27,7 @@ Execute `npm run check` e `npm test`. Os testes usam servidor local temporário,
 ## Publicação futura
 
 Esta alteração é local. Para publicação, validar HTTPS, domínio, hospedagem e experiência em celular. Caso o hub futuro tenha contas, seu encaminhamento não substitui autorização para recursos privados que venham a existir.
+
+## Requisitos
+
+O escopo atual, os critérios de aceitação, as melhorias propostas e as instruções para testar na escola estão em [docs/requisitos/README.md](docs/requisitos/README.md).
